@@ -1,10 +1,11 @@
 {
   "name": "pragma-brewery",
   "version": "1.0.0",
-  "description": "Pragma Brewery solution",
+  "description": "My webpack project",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "test",
+    "build": "webpack"
   },
   "repository": {
     "type": "git",
@@ -15,5 +16,21 @@
   "bugs": {
     "url": "https://github.com/MiroslavGannoha/pragma-brewery/issues"
   },
-  "homepage": "https://github.com/MiroslavGannoha/pragma-brewery#readme"
+  "homepage": "https://github.com/MiroslavGannoha/pragma-brewery#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "autoprefixer": "^9.8.6",
+    "babel-plugin-syntax-dynamic-import": "^6.18.0",
+    "css-loader": "^4.2.2",
+    "mini-css-extract-plugin": "^0.11.0",
+    "postcss-loader": "^3.0.0",
+    "precss": "^4.0.0",
+    "style-loader": "^1.2.1",
+    "terser-webpack-plugin": "^4.1.0",
+    "ts-loader": "^8.0.3",
+    "typescript": "^4.0.2",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12",
+    "workbox-webpack-plugin": "^5.1.3"
+  }
 }
