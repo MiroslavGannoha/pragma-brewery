@@ -1,0 +1,19 @@
+{
+  "name": "pragma-brewery",
+  "version": "1.0.0",
+  "description": "Pragma Brewery solution",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MiroslavGannoha/pragma-brewery.git"
+  },
+  "author": "Miroslav Gannoha",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MiroslavGannoha/pragma-brewery/issues"
+  },
+  "homepage": "https://github.com/MiroslavGannoha/pragma-brewery#readme"
+}
