@@ -1,5 +1,7 @@
-const path = require('path');
-const webpack = require('webpack');
+import path from  'path';
+import webpack from  'webpack';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import WebpackCleanupPlugin from 'webpack-cleanup-plugin';
 
 /*
  * SplitChunksPlugin is enabled by default and replaced
@@ -29,8 +31,8 @@ const webpack = require('webpack');
  *
  */
 
-const autoprefixer = require('autoprefixer');
-const precss = require('precss');
+import autoprefixer from 'autoprefixer';
+import precss from 'precss';
 
 /*
  * We've enabled MiniCssExtractPlugin for you. This allows your app to
@@ -41,7 +43,7 @@ const precss = require('precss');
  *
  */
 
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 
 /*
  * We've enabled TerserPlugin for you! This minifies your app
@@ -51,32 +53,29 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
  *
  */
 
-const TerserPlugin = require('terser-webpack-plugin');
+import TerserPlugin from 'terser-webpack-plugin';
 
-const workboxPlugin = require('workbox-webpack-plugin');
+const isProduction = process.argv.indexOf('-p') >= 0;
 
-module.exports = {
-	mode: 'development',
-	entry: {},
-
-	plugins: [
+export default {
+    target: 'web',
+    mode: isProduction ? 'production' : 'development',
+    entry: './src/main.tsx',
+    devtool: isProduction ? false : 'cheap-source-map',
+    
+    plugins: [
 		new webpack.ProgressPlugin(),
-		new MiniCssExtractPlugin({ filename: 'main.[chunkhash].css' }),
-		new workboxPlugin.GenerateSW({
-			swDest: 'sw.js',
-			clientsClaim: true,
-			skipWaiting: false
-		})
-	],
+        new WebpackCleanupPlugin(),
+        new HtmlWebpackPlugin({
+            template: './server/public/index.html',
+        }),
+        new MiniCssExtractPlugin({ filename: 'main.[chunkhash].css' }),
+    ],
 
 	module: {
 		rules: [
-			{
-				test: /.(ts|tsx)?$/,
-				loader: 'ts-loader',
-				include: [],
-				exclude: [/node_modules/]
-			},
+            { test: /\.ts$/, loader: 'ts-loader', exclude: [/node_modules/]},
+            { test: /\.tsx$/, loader: 'babel-loader!ts-loader', exclude: [/node_modules/] },
 			{
 				test: /.css$/,
 
@@ -110,7 +109,10 @@ module.exports = {
 	},
 
 	resolve: {
-		extensions: ['.tsx', '.ts', '.js']
+        extensions: ['.tsx', '.ts', '.js'],
+        alias: {
+            app: path.resolve(__dirname, 'src/app/'),
+        },
 	},
 
 	optimization: {
