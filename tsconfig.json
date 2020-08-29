@@ -5,6 +5,7 @@
         "strict": true,
         "module": "commonjs",
         "esModuleInterop": true,
+        "resolveJsonModule": true,
         "target": "es6",
         "allowJs": true,
         "jsx": "react"

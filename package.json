@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "test",
-    "build": "webpack -p",
-    "serve": "ts-node ./server/index.ts"
+    "build": "webpack -p --config webpack.config.ts",
+    "serve": "ts-node-dev --respawn ./server/index.ts"
   },
   "repository": {
     "type": "git",
@@ -21,6 +21,7 @@
   "dependencies": {
     "mobx": "^5.15.6",
     "mobx-react-lite": "^2.2.0",
+    "node-fetch": "^2.6.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1"
   },
@@ -50,6 +51,7 @@
     "terser-webpack-plugin": "^4.1.0",
     "ts-loader": "^8.0.3",
     "ts-node": "^9.0.0",
+    "ts-node-dev": "^1.0.0-pre.61",
     "typescript": "^4.0.2",
     "webpack": "^4.44.1",
     "webpack-cleanup-plugin": "^0.5.1",
