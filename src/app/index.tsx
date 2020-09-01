@@ -1,11 +1,10 @@
 import * as React from 'react';
+import Dashboard from './pages/Dashboard';
 
 const App: React.FC = () => {
 
     return (
-        <div>
-            Pragma brewery - React App
-        </div>
+        <Dashboard />
     );
 };
 
