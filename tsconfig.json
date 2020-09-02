@@ -8,6 +8,7 @@
         "resolveJsonModule": true,
         "target": "es6",
         "allowJs": true,
-        "jsx": "react"
+        "jsx": "react",
+        "experimentalDecorators": true
     }
 }

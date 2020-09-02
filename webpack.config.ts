@@ -131,5 +131,5 @@ export default {
 			minSize: 30000,
 			name: true
 		}
-	}
+    },
 };
