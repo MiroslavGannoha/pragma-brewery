@@ -16,34 +16,9 @@ import WebpackCleanupPlugin from 'webpack-cleanup-plugin';
  *
  */
 
-/*
- * We've enabled Postcss, autoprefixer and precss for you. This allows your app
- * to lint  CSS, support variables and mixins, transpile future CSS syntax,
- * inline images, and more!
- *
- * To enable SASS or LESS, add the respective loaders to module.rules
- *
- * https://github.com/postcss/postcss
- *
- * https://github.com/postcss/autoprefixer
- *
- * https://github.com/jonathantneal/precss
- *
- */
-
 import autoprefixer from 'autoprefixer';
-import precss from 'precss';
+import tailwindcss from 'tailwindcss';
 
-/*
- * We've enabled MiniCssExtractPlugin for you. This allows your app to
- * use css modules that will be moved into a separate CSS file instead of inside
- * one of your module entries!
- *
- * https://github.com/webpack-contrib/mini-css-extract-plugin
- *
- */
-
-import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 
 /*
  * We've enabled TerserPlugin for you! This minifies your app
@@ -65,11 +40,10 @@ export default {
     
     plugins: [
 		new webpack.ProgressPlugin(),
-        new WebpackCleanupPlugin(),
+        ...(isProduction ? [new WebpackCleanupPlugin()] : []),
         new HtmlWebpackPlugin({
             template: './server/public/index.html',
         }),
-        new MiniCssExtractPlugin({ filename: 'main.[chunkhash].css' }),
     ],
 
 	module: {
@@ -80,9 +54,6 @@ export default {
 				test: /.css$/,
 
 				use: [
-					{
-						loader: MiniCssExtractPlugin.loader
-					},
 					{
 						loader: 'style-loader'
 					},
@@ -96,11 +67,10 @@ export default {
 					},
 					{
 						loader: 'postcss-loader',
-
 						options: {
-							plugins: function() {
-								return [precss, autoprefixer];
-							}
+                            ident: 'postcss',
+                            
+							plugins: [tailwindcss, autoprefixer],
 						}
 					}
 				]
