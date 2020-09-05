@@ -9,6 +9,12 @@
         "target": "es6",
         "allowJs": true,
         "jsx": "react",
-        "experimentalDecorators": true
+        "experimentalDecorators": true,
+        "lib": [
+            "DOM",
+            "ES5",
+            "ES6",
+            "ESNext"
+        ]
     }
 }
