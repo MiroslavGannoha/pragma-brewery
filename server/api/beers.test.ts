@@ -3,7 +3,7 @@ import request from 'supertest';
 
 describe('Beers API', () => {
     it('responds with beers', async () => {
-        const {statusCode, body} = await request(app).get('/api/beers');
+        const { statusCode, body } = await request(app).get('/api/beers');
         expect(statusCode).toEqual(200);
         expect(body.length).toBeGreaterThan(0);
         const firstBeer = body[0];
@@ -13,9 +13,12 @@ describe('Beers API', () => {
         expect(firstBeer).toHaveProperty('maxTemperature');
         expect(firstBeer).toHaveProperty('temperature');
     });
+
     it('provides temperatures for beer ids', async () => {
-        const ids = [1,2,3];
-        const {statusCode, body} = await request(app).get('/api/beers/temperature?ids=' + ids.join(','));
+        const ids = [1, 2, 3];
+        const { statusCode, body } = await request(app).get(
+            '/api/beers/temperature?ids=' + ids.join(',')
+        );
         expect(statusCode).toEqual(200);
 
         expect(body.length).toBeGreaterThan(0);
@@ -23,5 +26,14 @@ describe('Beers API', () => {
         expect(firstTemperatureItem.status).toBe('fulfilled');
         expect(firstTemperatureItem.value).toHaveProperty('id');
         expect(firstTemperatureItem.value).toHaveProperty('temperature');
+    });
+
+    it('responses with error if no ids set', async () => {
+        const { statusCode, body } = await request(app).get(
+            '/api/beers/temperature'
+        );
+        expect(statusCode).toEqual(400);
+
+        expect(body.length).toBe(0);
     });
 });
