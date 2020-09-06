@@ -17,13 +17,12 @@ router.get('/temperature?:ids', function (req, res) {
         return;
     }
     const beersIds = req.query.ids as string;
-    const beerTempPromises = beersIds
+    const beerTempPromises: Promise<{id: string; temperature: string}>[] = beersIds
         .split(',')
         .map((id) =>
             fetch(config.tempServiceURL + '/' + id).then((res) => res.json())
         );
 
-    // @ts-ignore (allSettled is missing in types lib)
     Promise.allSettled(beerTempPromises).then((data) => res.send(data));
 });
 
