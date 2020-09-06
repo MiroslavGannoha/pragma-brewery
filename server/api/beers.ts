@@ -2,10 +2,11 @@ import express from 'express';
 import beersDBData from '../db/beers.json';
 import config from '../config';
 import fetch from 'node-fetch';
+import { IBeerPlain } from '../../src/app/stores/BeersStore/models';
 
 const router = express.Router();
 router.get('/', function (req, res) {
-    res.send(beersDBData);
+    res.send(beersDBData as IBeerPlain[]);
 });
 
 router.get('/temperature?:ids', function (req, res) {
@@ -23,7 +24,7 @@ router.get('/temperature?:ids', function (req, res) {
             fetch(config.tempServiceURL + '/' + id).then((res) => res.json())
         );
 
-    Promise.allSettled(beerTempPromises).then((data) => res.send(data));
+    Promise.allSettled(beerTempPromises).then((result) => res.send(result));
 });
 
 export default router;

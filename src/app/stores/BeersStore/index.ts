@@ -87,6 +87,7 @@ export class BeersStore {
         if (!this.pollingBeerTempIds.length) {
             return;
         }
+
         this.fetchTemperatures(this.pollingBeerTempIds).then(() => {
             setTimeout(() => this.doTemperaturesPolling(), this.beerPollingTime);
         });

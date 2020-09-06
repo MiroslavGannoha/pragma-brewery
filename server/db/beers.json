@@ -3,36 +3,42 @@
         "id": "1",
         "type": "Pilsner",
         "minTemperature": 4,
-        "maxTemperature": 6
+        "maxTemperature": 6,
+        "temperature": null
     },
     {
         "id": "2",
         "type": "IPA",
         "minTemperature": 5,
-        "maxTemperature": 6
+        "maxTemperature": 6,
+        "temperature": null
     },
     {
         "id": "3",
         "type": "Lager",
         "minTemperature": 4,
-        "maxTemperature": 7
+        "maxTemperature": 7,
+        "temperature": null
     },
     {
         "id": "4",
         "type": "Stout",
         "minTemperature": 6,
-        "maxTemperature": 8
+        "maxTemperature": 8,
+        "temperature": null
     },
     {
         "id": "5",
         "type": "Wheat beer",
         "minTemperature": 3,
-        "maxTemperature": 5
+        "maxTemperature": 5,
+        "temperature": null
     },
     {
         "id": "6",
         "type": "Pale Ale",
         "minTemperature": 4,
-        "maxTemperature": 6
+        "maxTemperature": 6,
+        "temperature": null
     }
 ]

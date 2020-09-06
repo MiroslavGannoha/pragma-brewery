@@ -7,6 +7,8 @@ import fetchMock from 'fetch-mock-jest';
 import { IBeerPlain, Beer } from './models';
 import { flushPromises } from '../../../../test/utils';
 
+jest.useFakeTimers();
+
 const beersMockData: Readonly<IBeerPlain[]> = [
     {
         id: '1',
@@ -99,37 +101,52 @@ describe('BeersStore', () => {
                             : null,
                 };
             });
-    
+
             beersStore.beerPollingTime = 1;
             beersMockData.forEach(beersStore.saveBeer.bind(beersStore));
-    
+
             beersStore?.startTemperaturesPolling(mockIds);
-    
+
             // additional flush per cycle to flush response.json() call
             expect(fetchMock).toHaveFetchedTimes(1, tempUrl);
+
             await flushPromises();
             await flushPromises();
+            jest.runOnlyPendingTimers();
+
             expect(fetchMock).toHaveFetchedTimes(2, tempUrl);
+
             await flushPromises();
             await flushPromises();
+            jest.runOnlyPendingTimers();
+            beersStore?.stopTemperaturesPolling();
+
             expect(fetchMock).toHaveFetchedTimes(3, tempUrl);
             expect(beersStore?.beers).toEqual(beersMockDataMerged);
-    
-            beersStore?.stopTemperaturesPolling();
+
+            await flushPromises();
+            await flushPromises();
+            jest.runOnlyPendingTimers();
+
+            expect(fetchMock).toHaveFetchedTimes(3, tempUrl);
         });
-    
+
         it('stops polling', async () => {
             const mockIds = beersMockData.map(({ id }) => id);
             const tempUrl = '/api/beers/temperature?ids=' + mockIds.join(',');
-    
+
             beersMockData.forEach(beersStore.saveBeer.bind(beersStore));
-    
+
             beersStore?.startTemperaturesPolling(mockIds);
+
             expect(fetchMock).toHaveFetchedTimes(1, tempUrl);
+
             beersStore?.stopTemperaturesPolling();
             await flushPromises();
             await flushPromises();
+            jest.runOnlyPendingTimers();
+
             expect(fetchMock).toHaveFetchedTimes(1, tempUrl);
         });
-    })
+    });
 });
