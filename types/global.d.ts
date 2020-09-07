@@ -3,6 +3,11 @@ declare module '*.json' {
     export default value;
 }
 
+declare module '*.svg' {
+    const value: string;
+    export default value;
+}
+
 declare namespace jest {
     interface Matchers<R> {
         toHaveFetched: (expected: string) => CustomMatcherResult;
