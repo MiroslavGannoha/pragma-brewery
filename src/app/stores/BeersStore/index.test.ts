@@ -84,6 +84,14 @@ describe('BeersStore', () => {
         expect(beersStore?.beers).toEqual(beersMockData);
     });
 
+    it('resets data on fetch', async () => {
+        beersStore.saveBeer({id: 'some id', type: 'Pilsner', temperature: null, minTemperature: 3, maxTemperature: 5});
+        await beersStore?.fetchBeers();
+
+        expect(fetchMock).toHaveFetchedTimes(1, '/api/beers');
+        expect(beersStore?.beers).toEqual(beersMockData);
+    });
+
     describe('temperatures', () => {
         const mockIds = beersMockData.map(({ id }) => id);
         const tempUrl = '/api/beers/temperature?ids=' + mockIds.join(',');
