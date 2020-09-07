@@ -29,11 +29,9 @@ describe('Beers API', () => {
     });
 
     it('responses with error if no ids set', async () => {
-        const { statusCode, body } = await request(app).get(
+        const { statusCode } = await request(app).get(
             '/api/beers/temperature'
         );
         expect(statusCode).toEqual(400);
-
-        expect(body.length).toBe(0);
     });
 });

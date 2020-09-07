@@ -7,7 +7,7 @@ type BeerTemperature = {
 };
 
 export type BeerTemperatureSettledResult = PromiseSettledResult<BeerTemperature>[];
-export const beerDefaulPollingTime = 10000;
+export const beerDefaulPollingTime = 6000;
 
 export class BeersStore {
     @observable public beers: Beer[] = [];
