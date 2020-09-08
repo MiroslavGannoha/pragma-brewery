@@ -71,7 +71,6 @@ export class BeersStore {
     private fetchTemperatures(
         ids: string[]
     ): Promise<BeerTemperatureSettledResult> {
-
         return fetch('/api/beers/temperature?ids=' + ids.join(','))
             .then((response) => response.json())
             .then((temperaturesData: BeerTemperatureSettledResult) => {
@@ -95,10 +94,12 @@ export class BeersStore {
 
         this.fetchTemperatures(this.pollingBeerTempIds)
             .catch((error) => {
-                if (!this.keepPollingOnError) {
-                    this.stopTemperaturesPolling();
-                    return Promise.reject(error);
+                if (this.keepPollingOnError) {
+                    console.log('Couldn\'t fetch temperatures - retrying');
+                    return;
                 }
+                this.stopTemperaturesPolling();
+                return Promise.reject(error);
             })
             .then(() => {
                 setTimeout(
@@ -108,7 +109,7 @@ export class BeersStore {
             })
             .catch((error) => {
                 // error handling
-                console.warn(error.message);
+                console.warn(error.message)
             });
     }
 }
