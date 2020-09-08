@@ -11,9 +11,10 @@ const Dashboard: React.FC = observer(() => {
     const beersFetchResult = useAsync(() => beersStore.fetchBeers());
 
     React.useEffect(() => {
-        if (beersFetchResult.status === 'fulfilled') {
+        const { status } = beersFetchResult;
+        if (status === 'fulfilled') {
             beersStore.startTemperaturesPolling(beers.map(({ id }) => id));
-        } else if (beersFetchResult.status === 'rejected') {
+        } else if (status === 'rejected') {
             beersStore.stopTemperaturesPolling();
         }
         return () => beersStore.stopTemperaturesPolling();
