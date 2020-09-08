@@ -6,13 +6,17 @@ type BeerTemperature = {
     temperature: string;
 };
 
-export type BeerTemperatureSettledResult = PromiseSettledResult<BeerTemperature>[];
+export type BeerTemperatureSettledResult = PromiseSettledResult<
+    BeerTemperature
+>[];
 export const beerDefaulPollingTime = 6000;
+export const defaultKeepPollingOnError = true;
 
 export class BeersStore {
     @observable public beers: Beer[] = [];
     @observable public pollingBeerTempIds: string[] = [];
     @observable public beerPollingTime = beerDefaulPollingTime;
+    @observable public keepPollingOnError = defaultKeepPollingOnError;
 
     @action
     public fetchBeers(): Promise<IBeerPlain[]> {
@@ -48,6 +52,7 @@ export class BeersStore {
         this.beers = [];
         this.pollingBeerTempIds = [];
         this.beerPollingTime = beerDefaulPollingTime;
+        this.keepPollingOnError = defaultKeepPollingOnError;
     }
 
     @action
@@ -66,12 +71,12 @@ export class BeersStore {
     private fetchTemperatures(
         ids: string[]
     ): Promise<BeerTemperatureSettledResult> {
+
         return fetch('/api/beers/temperature?ids=' + ids.join(','))
             .then((response) => response.json())
             .then((temperaturesData: BeerTemperatureSettledResult) => {
                 temperaturesData.forEach((settledResult) => {
                     if (settledResult.status === 'rejected') {
-                        // console.warn(settledResult.reason);
                         return;
                     }
 
@@ -88,8 +93,22 @@ export class BeersStore {
             return;
         }
 
-        this.fetchTemperatures(this.pollingBeerTempIds).then(() => {
-            setTimeout(() => this.doTemperaturesPolling(), this.beerPollingTime);
-        });
+        this.fetchTemperatures(this.pollingBeerTempIds)
+            .catch((error) => {
+                if (!this.keepPollingOnError) {
+                    this.stopTemperaturesPolling();
+                    return Promise.reject(error);
+                }
+            })
+            .then(() => {
+                setTimeout(
+                    () => this.doTemperaturesPolling(),
+                    this.beerPollingTime
+                );
+            })
+            .catch((error) => {
+                // error handling
+                console.warn(error.message);
+            });
     }
 }

@@ -2,12 +2,20 @@ import {
     BeersStore,
     beerDefaulPollingTime,
     BeerTemperatureSettledResult,
+    defaultKeepPollingOnError,
 } from './';
 import fetchMock from 'fetch-mock-jest';
 import { IBeerPlain, Beer } from './models';
 import { flushPromises } from '../../../../test/utils';
 
 jest.useFakeTimers();
+
+async function flushTempPollingCycle() {
+    // additional flush per cycle to flush response.json() call
+    await flushPromises();
+    await flushPromises();
+    jest.runOnlyPendingTimers();
+}
 
 const beersMockData: Readonly<IBeerPlain[]> = [
     {
@@ -42,31 +50,37 @@ const temperatureSettledMock: Readonly<BeerTemperatureSettledResult> = [
 ];
 
 describe('BeersStore', () => {
-    fetchMock.get('/api/beers', beersMockData);
-
     const beersStore: BeersStore = new BeersStore();
+
+    beforeEach(() => {
+        fetchMock.get('/api/beers', beersMockData);
+    });
 
     afterEach(() => {
         fetchMock.mockClear();
+        fetchMock.reset();
         beersStore.reset();
     });
 
     it('inits with default values', () => {
         expect(beersStore.beers).toEqual([]);
         expect(beersStore?.pollingBeerTempIds).toEqual([]);
-        expect(beersStore?.beerPollingTime).toEqual(beerDefaulPollingTime);
+        expect(beersStore?.beerPollingTime).toBe(beerDefaulPollingTime);
+        expect(beersStore?.keepPollingOnError).toBe(defaultKeepPollingOnError);
     });
 
     it('resets to default values', () => {
         beersMockData.forEach(beersStore.saveBeer.bind(beersStore));
         beersStore.pollingBeerTempIds = ['1'];
         beersStore.beerPollingTime = 999999;
+        beersStore.keepPollingOnError = false;
 
         beersStore.reset();
 
         expect(beersStore.beers).toEqual([]);
         expect(beersStore?.pollingBeerTempIds).toEqual([]);
         expect(beersStore?.beerPollingTime).toEqual(beerDefaulPollingTime);
+        expect(beersStore?.keepPollingOnError).toEqual(defaultKeepPollingOnError);
     });
 
     it('stores beer data', () => {
@@ -85,7 +99,13 @@ describe('BeersStore', () => {
     });
 
     it('resets data on fetch', async () => {
-        beersStore.saveBeer({id: 'some id', type: 'Pilsner', temperature: null, minTemperature: 3, maxTemperature: 5});
+        beersStore.saveBeer({
+            id: 'some id',
+            type: 'Pilsner',
+            temperature: null,
+            minTemperature: 3,
+            maxTemperature: 5,
+        });
         await beersStore?.fetchBeers();
 
         expect(fetchMock).toHaveFetchedTimes(1, '/api/beers');
@@ -95,9 +115,14 @@ describe('BeersStore', () => {
     describe('temperatures', () => {
         const mockIds = beersMockData.map(({ id }) => id);
         const tempUrl = '/api/beers/temperature?ids=' + mockIds.join(',');
-        fetchMock.get(tempUrl, temperatureSettledMock);
+
+        beforeEach(() => {
+            beersStore.beerPollingTime = 1;
+            beersMockData.forEach(beersStore.saveBeer.bind(beersStore));
+        });
 
         it('starts polling', async () => {
+            fetchMock.get(tempUrl, temperatureSettledMock);
             // beers and temepratures merged
             const beersMockDataMerged = beersMockData.map((beer, indx) => {
                 const tempData = temperatureSettledMock[indx];
@@ -110,51 +135,70 @@ describe('BeersStore', () => {
                 };
             });
 
-            beersStore.beerPollingTime = 1;
-            beersMockData.forEach(beersStore.saveBeer.bind(beersStore));
-
             beersStore?.startTemperaturesPolling(mockIds);
 
-            // additional flush per cycle to flush response.json() call
             expect(fetchMock).toHaveFetchedTimes(1, tempUrl);
 
-            await flushPromises();
-            await flushPromises();
-            jest.runOnlyPendingTimers();
+            await flushTempPollingCycle();
 
             expect(fetchMock).toHaveFetchedTimes(2, tempUrl);
 
-            await flushPromises();
-            await flushPromises();
-            jest.runOnlyPendingTimers();
+            await flushTempPollingCycle();
             beersStore?.stopTemperaturesPolling();
 
             expect(fetchMock).toHaveFetchedTimes(3, tempUrl);
             expect(beersStore?.beers).toEqual(beersMockDataMerged);
 
-            await flushPromises();
-            await flushPromises();
-            jest.runOnlyPendingTimers();
+            await flushTempPollingCycle();
 
             expect(fetchMock).toHaveFetchedTimes(3, tempUrl);
         });
 
         it('stops polling', async () => {
-            const mockIds = beersMockData.map(({ id }) => id);
-            const tempUrl = '/api/beers/temperature?ids=' + mockIds.join(',');
-
-            beersMockData.forEach(beersStore.saveBeer.bind(beersStore));
-
+            fetchMock.get(tempUrl, temperatureSettledMock);
             beersStore?.startTemperaturesPolling(mockIds);
 
             expect(fetchMock).toHaveFetchedTimes(1, tempUrl);
 
             beersStore?.stopTemperaturesPolling();
-            await flushPromises();
-            await flushPromises();
-            jest.runOnlyPendingTimers();
+            await flushTempPollingCycle();
 
             expect(fetchMock).toHaveFetchedTimes(1, tempUrl);
+        });
+
+        describe('keepPollingOnError param', () => {
+            it('keeps polling on error by default', async () => {
+                fetchMock.get(tempUrl, {
+                    throws: new Error('Failed to fetch'),
+                });
+
+                beersStore?.startTemperaturesPolling(mockIds);
+
+                expect(fetchMock).toHaveFetchedTimes(1, tempUrl);
+
+                await flushTempPollingCycle();
+                beersStore?.stopTemperaturesPolling();
+
+                expect(fetchMock).toHaveFetchedTimes(2, tempUrl);
+
+                expect(beersStore?.beers).toEqual(beersMockData);
+            });
+
+            it('keeps no polling if set to false', async () => {
+                fetchMock.get(tempUrl, {
+                    throws: new Error('Failed to fetch'),
+                });
+                beersStore.keepPollingOnError = false;
+                beersStore?.startTemperaturesPolling(mockIds);
+
+                expect(fetchMock).toHaveFetchedTimes(1, tempUrl);
+
+                await flushTempPollingCycle();
+
+                expect(fetchMock).toHaveFetchedTimes(1, tempUrl);
+
+                expect(beersStore?.beers).toEqual(beersMockData);
+            });
         });
     });
 });
