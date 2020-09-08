@@ -4,12 +4,16 @@
 
 `Nodejs` must be installed. Desirably one of the latest versions - I have used `v14.8.0`.
 And then run from the command line:
-`$ npm install`
-`$ npm run build`
-`$ npm start`
+```
+npm install
+npm run build
+npm start
+```
 
 For testing
-`$ npm test`
+```
+npm test
+```
 
 If you have any troubles running the project please let me know.
 
@@ -50,47 +54,47 @@ If you have any troubles running the project please let me know.
 
     Also there is good showcase for new typescript operator `??`. Temperature could be `null` or `number` as declared in Beer model. `null` - when no data received yet and any `number` - when at least one response data recorded. Regular `if` or analogical operator would not display `0` temp. But `??` operator helps here.
 
-```typescript
-export interface IBeerPlain {
-    id: string;
-    minTemperature: number;
-    maxTemperature: number;
-    type: BeerType;
-    temperature: null | number;
-}
-
-// ...................
-<td className="...">{temperature ?? 'n/a'}</td>;
-// ...................
-```
-
-`useAsync` hook with `AsyncResultContentWrapper` also good example for handling any async request in react components.
-
-```typescript
-// ...................
-export const AsyncResultWrapper: React.FC<{ result: UseAsyncResult }> = ({
-    result,
-    children,
-}) => {
-    switch (result.status) {
-        case 'pending':
-            return <>Loading ...</>;
-        case 'fulfilled':
-            return <>{children}</>;
-        case 'rejected':
-            return <>Failed to fetch: {result.reason}</>;
-        default:
-            return null;
+    ```typescript
+    export interface IBeerPlain {
+        id: string;
+        minTemperature: number;
+        maxTemperature: number;
+        type: BeerType;
+        temperature: null | number;
     }
-};
-// ...................
-const beersFetchResult = useAsync(() => beersStore.fetchBeers());
-// ...................
 
-<AsyncResultWrapper result={beersFetchResult}>
-    <BeersTable beers={beers} />
-</AsyncResultWrapper>;
-```
+    // ...................
+    <td className="...">{temperature ?? 'n/a'}</td>;
+    // ...................
+    ```
+
+    `useAsync` hook with `AsyncResultContentWrapper` also good example for handling any async request in react components.
+
+    ```typescript
+    // ...................
+    export const AsyncResultWrapper: React.FC<{ result: UseAsyncResult }> = ({
+        result,
+        children,
+    }) => {
+        switch (result.status) {
+            case 'pending':
+                return <>Loading ...</>;
+            case 'fulfilled':
+                return <>{children}</>;
+            case 'rejected':
+                return <>Failed to fetch: {result.reason}</>;
+            default:
+                return null;
+        }
+    };
+    // ...................
+    const beersFetchResult = useAsync(() => beersStore.fetchBeers());
+    // ...................
+
+    <AsyncResultWrapper result={beersFetchResult}>
+        <BeersTable beers={beers} />
+    </AsyncResultWrapper>;
+    ```
 
 -   **What could you do better in your code next iteration?**
     Having more time I would add tests for react components, improve tests overall. Also I could add routing and some navigation.
