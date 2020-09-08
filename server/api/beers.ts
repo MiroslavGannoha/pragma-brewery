@@ -1,8 +1,9 @@
 import express from 'express';
 import beersDBData from '../db/beers.json';
-import config from '../config';
 import fetch from 'node-fetch';
 import { IBeerPlain } from '../../src/app/stores/BeersStore/models';
+
+const tempServiceURL = 'https://temperature-sensor-service.herokuapp.com/sensor';
 
 const router = express.Router();
 router.get('/', function (req, res) {
@@ -21,7 +22,7 @@ router.get('/temperature?:ids', function (req, res) {
     const beerTempPromises: Promise<{id: string; temperature: string}>[] = beersIds
         .split(',')
         .map((id) =>
-            fetch(config.tempServiceURL + '/' + id).then((res) => res.json())
+            fetch(tempServiceURL + '/' + id).then((res) => res.json())
         );
 
     Promise.allSettled(beerTempPromises).then((result) => res.send(result));
