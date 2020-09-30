@@ -28,6 +28,7 @@ Each beer has its own specific refrigeration needs while being transported:
 - Beer 4 (Stout): 6°C - 8°C
 - Beer 5 (Wheat beer): 3°C - 5°C
 - Beer 6 (Pale Ale): 4°C - 6°C
+
 The refrigerated truck is loaded with multiple containers with beer bottles inside, each
 container set to a specific temperature and each containing a thermometer sensor.
 While driving, Shane is alerted if any of the containers fall outside of the temperature range.
